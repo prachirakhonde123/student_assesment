@@ -16,7 +16,7 @@ const studentSchema = new mongoose.Schema({
         required : true
     },
     user : {
-        ref : teacher,
+        ref : "teacher",
         type : ObjectId
     },
     isDeleted : {
