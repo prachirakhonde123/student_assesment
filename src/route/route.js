@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const {registerTeacher, login} = require('../controller/teacherController')
-const {createStudent,getStudents} = require('../controller/studentController')
+const {createStudent,getStudents, updateStudent, addStudent, deleteStudent} = require('../controller/studentController')
 const {authentication} = require('../authentication/auth')
 
 
@@ -13,9 +13,11 @@ const {authentication} = require('../authentication/auth')
 router.post('/register',registerTeacher)
 router.post('/login',login)
 
-//router.post('/student',createStudent)
 router.post('/student',authentication,createStudent)
+router.post('/addstudent',authentication,addStudent)
 router.get('/getList',authentication,getStudents)
+router.put('/updateMarks',authentication, updateStudent)
+router.put('/deleteProfile', authentication, deleteStudent)
 
 
 module.exports = router
