@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken')
-//const studentModel = require('../schema/student')
-//const teacherModel = require('../schema/teacher')
 
 const authentication = async (req,res,next)=>{
     try{

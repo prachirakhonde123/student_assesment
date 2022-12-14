@@ -138,12 +138,14 @@ const updateDetails = async (req, res) => {
         }
         
         if(name || subject){
-            if(name){                
+            if(name){   
+                let alreadyPresent = await studentModel.findOne({name : name, subject : findStudent.subject}) 
+                if(alreadyPresent) return res.status(409).send({status : false, msg : "Student profile is already present with this name and subject"})            
                 let updateDetails = await studentModel.findOneAndUpdate({ _id: studentId, isDeleted: false }, { $set: { name: name } }, { new: true })
                 return res.status(200).send({ status: true, msg: "Profile Updated Successfully", data: updateDetails })
             }
             else{               
-                let alreadyPresent = await studentModel.findOne({name : name, subject : subject})
+                let alreadyPresent = await studentModel.findOne({name : findStudent.name, subject : subject})
                 if(alreadyPresent){
                     return res.status(409).send({status : false, msg : "Student profile is already present with this name and subject"})
                 }

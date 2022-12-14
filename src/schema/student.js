@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const teacher = require('./teacher')
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 const studentSchema = new mongoose.Schema({
