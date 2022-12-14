@@ -108,7 +108,7 @@ const updateDetails = async (req, res) => {
         let studentId = req.params.studentId
         let userId = req.token
         let data = req.body
-        let { name } = data
+        let { name,subject } = data
 
         if (!mongoose.Types.ObjectId.isValid(studentId)) {
             return res.status(400).send({ status: false, message: "Invalid Student Id" })
@@ -118,16 +118,39 @@ const updateDetails = async (req, res) => {
         if (!findStudent) return res.status(404).send({ status: false, msg: "No profle found or may be deleted" })
 
         if (findStudent.user.toString() !== userId) return res.status(403).send({ status: false, msg: "Unauthorized Person to update profile" })
-
-        if (name !== undefined) {
+        
+        if (name && name !== undefined) {
             if (typeof name != "string" || !validName(name)) return res.status(400).send({ status: false, msg: "Invalid format of name" })
         }
+        if (subject && !validSubject(subject.toLowerCase())) return res.status(400).send({ status: false, msg: `Wrong Subject. Subject should be ["maths", "science", "history", "geography", "english", "javascript", "java"]` })
 
-        let updateDetails = await studentModel.findOneAndUpdate({ _id: studentId, isDeleted: false }, { $set: { name: name } }, { new: true })
-        if (!updateDetails) return res.status(404).send({ status: false, msg: "No profile found" })
-
-        return res.status(200).send({ status: true, msg: "Profile Updated Successfully", data: updateDetails })
-
+        if(name && subject){
+            let alreadyPresent = await studentModel.findOne({name : name, subject : subject})
+                if(alreadyPresent){
+                    return res.status(409).send({status : false, msg : "Student profile is already present with this name and subject"})
+                }
+            let obj = {
+                name : name,
+                subject : subject
+            }    
+            let updateDetails = await studentModel.findOneAndUpdate({ _id: studentId, isDeleted: false }, { $set: obj}, { new: true })
+            return res.status(200).send({ status: true, msg: "Profile Updated Successfully", data: updateDetails })            
+        }
+        
+        if(name || subject){
+            if(name){                
+                let updateDetails = await studentModel.findOneAndUpdate({ _id: studentId, isDeleted: false }, { $set: { name: name } }, { new: true })
+                return res.status(200).send({ status: true, msg: "Profile Updated Successfully", data: updateDetails })
+            }
+            else{               
+                let alreadyPresent = await studentModel.findOne({name : name, subject : subject})
+                if(alreadyPresent){
+                    return res.status(409).send({status : false, msg : "Student profile is already present with this name and subject"})
+                }
+                let updateDetails = await studentModel.findOneAndUpdate({ _id: studentId, isDeleted: false }, { $set: { subject: subject } }, { new: true })
+                return res.status(200).send({ status: true, msg: "Profile Updated Successfully", data: updateDetails })
+            }
+        }
     }
     catch (err) {
         return res.status(500).send({ msg: "Server Error", err: err.message })
